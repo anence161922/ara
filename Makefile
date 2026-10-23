@@ -53,10 +53,10 @@ endif
 # Submodule update - Big modules are not automatically updated by default
 # and require a manual call.
 git-submodules:
-	git submodule update --init --recursive
-	git submodule update --init --recursive --checkout -- $(ROOT_DIR)/toolchain/riscv-gnu-toolchain
-	git submodule update --init --recursive --checkout -- $(ROOT_DIR)/toolchain/newlib
-	git submodule update --init --recursive --checkout -- $(ROOT_DIR)/toolchain/riscv-llvm
+	# git submodule update --init --recursive
+	# git submodule update --init --recursive --checkout -- $(ROOT_DIR)/toolchain/riscv-gnu-toolchain
+	# git submodule update --init --recursive --checkout -- $(ROOT_DIR)/toolchain/newlib
+	# git submodule update --init --recursive --checkout -- $(ROOT_DIR)/toolchain/riscv-llvm
 
 # Default target
 .PHONY: git-submodules
@@ -116,7 +116,7 @@ toolchain-llvm-rt: git-submodules Makefile toolchain-llvm-main toolchain-llvm-ne
 	-DCOMPILER_RT_BUILD_MEMPROF=OFF \
 	-DCOMPILER_RT_BUILD_PROFILE=OFF \
 	-DCOMPILER_RT_BUILD_SANITIZERS=OFF \
-	-DCOMPILER_RT_BUILD_XRAY=OFF \
+	-DCOMPILER_RT_BUILD_XRAY=OFF -DCOMPILER_RT_BUILD_ORC=OFF -DCOMPILER_RT_BUILD_GWP_ASAN=OFF -DCOMPILER_RT_BUILD_CTX_PROFILE=OFF \
 	-DCMAKE_C_COMPILER_WORKS=1 \
 	-DCMAKE_CXX_COMPILER_WORKS=1 \
 	-DCMAKE_SIZEOF_VOID_P=4 \
@@ -129,7 +129,7 @@ toolchain-llvm-rt: git-submodules Makefile toolchain-llvm-main toolchain-llvm-ne
 	-DLLVM_CONFIG_PATH=$(LLVM_INSTALL_DIR)/bin/llvm-config
 	cd $(ROOT_DIR)/toolchain/riscv-llvm/compiler-rt && \
 	$(CMAKE) --build build --target install && \
-	ln -s $(LLVM_INSTALL_DIR)/lib/linux $(LLVM_INSTALL_DIR)/lib/clang/20/lib
+	ln -sf $(LLVM_INSTALL_DIR)/lib/linux $(LLVM_INSTALL_DIR)/lib/clang/20/lib
 
 # Spike
 .PHONY: riscv-isa-sim riscv-isa-sim-mod
@@ -175,8 +175,8 @@ ${VERIL_INSTALL_DIR}: Makefile
 	cd $(CURDIR)/toolchain/verilator && git reset --hard && git fetch && git checkout ${VERIL_VERSION}
 	# Compile verilator
 	cd $(CURDIR)/toolchain/verilator && git clean -xfdf && autoconf && \
-	CC=$(CLANG_CC) CXX=$(CLANG_CXX) CXXFLAGS=$(CLANG_CXXFLAGS) LDFLAGS=$(CLANG_LDFLAGS) \
-		./configure --prefix=$(VERIL_INSTALL_DIR) && make -j8 && make install
+	CC=gcc CXX=g++ CXXFLAGS="" LDFLAGS="" \
+		./configure --prefix=$(VERIL_INSTALL_DIR) && make -j64 && make install
 
 # RISC-V Tests
 riscv_tests:

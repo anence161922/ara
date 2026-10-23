@@ -208,14 +208,14 @@ $(veril_library)/V$(veril_top): $(config_file) Makefile ../Bender.yml $(shell fi
   tb/verilator/waiver.vlt                                                       \
   --Mdir $(veril_library)                                                       \
   -Itb/dpi                                                                      \
-  --compiler clang                                                              \
+                                                                \
   -CFLAGS "-DTOPLEVEL_NAME=$(veril_top)"                                        \
   -CFLAGS "-DNR_LANES=$(nr_lanes)"                                              \
   -CFLAGS -I$(ROOT_DIR)/tb/verilator/lowrisc_dv_verilator_memutil_dpi/cpp       \
   -CFLAGS -I$(ROOT_DIR)/tb/verilator/lowrisc_dv_verilator_memutil_verilator/cpp \
   -CFLAGS -I$(ROOT_DIR)/tb/verilator/lowrisc_dv_verilator_simutil_verilator/cpp \
   $(CLANG_CXXFLAGS)                                                             \
-  -LDFLAGS "-lelf"                                                              \
+  -CFLAGS "-I$(CONDA_PREFIX)/include" -LDFLAGS "-L$(CONDA_PREFIX)/lib -Wl,-rpath,$(CONDA_PREFIX)/lib -lelf"                                                              \
   $(CLANG_LDFLAGS)                                                              \
   --exe                                                                         \
   $(ROOT_DIR)/tb/verilator/lowrisc_dv_verilator_memutil_dpi/cpp/*.cc            \
